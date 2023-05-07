@@ -6,7 +6,7 @@ def my_funcenh(i,j,parlist,part,k,Dstd,D1,D2,elementcuthole,elementcutinc,Dvalue
                        xi1,xi2,c1,c2,N1,N2,N3,N4,element,elementnoc,phivalforpart):          #To build the B-matrix for enriched elements
 ##phivalues added and Dvalues1 removed        
          cc=i;dd=j
-         #dNdxi,detjenr,Jac = my_funcdet(cc,dd,xi1,xi2,c1,c2,N1,N2,N3,N4,element,elementnoc);  #(Last Update:27/03/2023)-line
+         #dNdxi,detjenr,Jac = my_funcdet(cc,dd,xi1,xi2,c1,c2,N1,N2,N3,N4,element,elementnoc); 
          detjenr = my_funcdet(cc,dd,xi1,xi2,c1,c2,N1,N2,N3,N4,element,elementnoc);
          dNdxi,detjenrpart,Jac = my_funcdetforpartition(cc,dd,xi1,xi2,c1,c2,N1,N2,N3,N4,element,parlist,part,k);
          
