@@ -1,6 +1,7 @@
 import numpy as np
 
-def stress_strain_component(i,disp,flatten,element,elementc,elementnoc,elementinsidehole,Dstd,D1,phivalues):
+def stress_strain_component(i,disp,flatten,element,elementc,elementnoc,elementinsidehole,Dstd,D1,phivalues,\
+                            phivalforpart,increment):
   disp3=[];
   for j in range(len(disp)):
         disp1=disp[j]
@@ -29,6 +30,7 @@ def stress_strain_component(i,disp,flatten,element,elementc,elementnoc,elementin
      elif i in elementinsidehole:
        stress2=np.matmul(D1,strain2);
   elif i in elementc:
+       phivaluesforsubgrid=phivalforpart[increment];
        Benr1=np.round(np.matmul(invj,dNdxi1),2);
        Benr=np.array([[(Benr1[0,0]),0,Benr1[0,0]*float(phivalues1[0]),0,Benr1[0,1],0,Benr1[0,1]*float(phivalues1[1]),0,Benr1[0,2],0,\
                     Benr1[0,2]*float(phivalues1[2]),0,Benr1[0,3],0,Benr1[0,3]*float(phivalues1[3]),0],\
@@ -37,8 +39,12 @@ def stress_strain_component(i,disp,flatten,element,elementc,elementnoc,elementin
                        [Benr1[1,0],Benr1[0,0],Benr1[1,0]*float(phivalues1[0]),Benr1[0,0]*float(phivalues1[0]),Benr1[1,1],Benr1[0,1],\
                         Benr1[1,1]*float(phivalues1[1]),Benr1[0,1]*float(phivalues1[1]),Benr1[1,2],Benr1[0,2],Benr1[1,2]*float(phivalues1[2]),Benr1[0,2]*float(phivalues1[2]),\
                         Benr1[1,3],Benr1[0,3],Benr1[1,3]*float(phivalues1[3]),Benr1[0,3]*float(phivalues1[3])]]);
-       strain2=np.matmul(Benr,noddisp)
-       stress2=np.matmul(D1,strain2);         ###Please change it today for better accuracy
-       
+       if np.sum(phivaluesforsubgrid[4]) < 0:    
+          strain2=np.matmul(Benr,noddisp)
+          stress2=np.matmul(D1,strain2);         ###Please change it today for better accuracy
+       else:
+          strain2=np.matmul(Benr,noddisp)
+          stress2=np.matmul(Dstd,strain2); 
+       increment=increment+1;
        
   return stress2,strain2
