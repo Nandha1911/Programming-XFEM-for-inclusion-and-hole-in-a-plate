@@ -638,44 +638,18 @@ flatten=np.linalg.solve(K,F);
 
 
 ###To calculate displacements,stresses,strains for all elements:-
+increment=0;
 for i in range(len(element)):
     disp=umatrix[i];   
     disp3,actdisp=Disp_stress_strain(i,disp,flatten,sigma,Bmatrix,elementc,elementnoc,elementinsidehole,phivalues)         ##Stress and strain will come from this block
     displacement.append(actdisp);
-    stress1,strain1=stress_strain_component(i,disp,flatten,element,elementc,elementnoc,elementinsidehole,Dstd,D1,phivalues)
+    stress1,strain1=stress_strain_component(i,disp,flatten,element,elementc,elementnoc,elementinsidehole,Dstd,D1,phivalues,\
+                                            phivalforpart,increment)
     stress.append(stress1)
     strain.append(strain1)
  
-'''   
-##To plot graph
-for i in range(len(stress)):
-    x.append(i);
-   # new_arr=np.delete(x,(0,10,20,30,40,50,60,70,80,90,91,92,93,94,95,96,97,98,99))
-    sigmax1=stress[i];
-    sigmax2=np.float32(sigmax1[0]);
-    sigmax3=np.float32(sigmax1[1]);
-    sigmax.append(sigmax2);
-    #sigmax=sigmax.tolist()
-    sigmay.append(sigmax3);
-    #sigmay=sigmay.tolist()
-   
-max=np.max(sigmax)
-min=np.min(sigmax)
-#sigmay=sigmay.tolist()   
-figure, axis = plt.subplots(2) 
 
-#####For stress in x-direction######## 
-axis[0].plot(x,sigmax)
-axis[0].set(xlabel="elements",ylabel="stress in x-direction")
-#axis[0].ylabel("stress in x-direction")
-
-axis[1].plot(x,sigmay)
-axis[1].set(xlabel="elements",ylabel="stress in y-direction")
-#axis[1].ylabel("stress in y-direction")
-
-plt.show()
-'''
-   
+ 
 xvalues2=np.linspace(0,br,nor)   ###Arranging elements
 yvalues2=np.linspace(0,L,noc)    ###Arranging elements
 xv1, yv1 = np.meshgrid(xvalues2, yvalues2)
@@ -684,10 +658,11 @@ zvalues3=np.zeros([nor,noc])
 loop=0;
 for i in range(len(xvalues2)):
     for j in range(len(yvalues2)):
-        zvalues2[i][j]=stress[loop][loop]
-        zvalues3[i][j]=stress[loop+1][loop]
+        stressforeach=stress[loop]
+        zvalues2[i][j]=stressforeach[0]
+        zvalues3[i][j]=stressforeach[1]
         loop=loop+1;
-        
+      
 
 #plt.plot(xv, yv, marker='.', color='k', linestyle='none')
 fig,ax2=plt.subplots(1,1)
@@ -703,8 +678,9 @@ cp3 = ax3.contourf(xv1, yv1, zvalues3)
 fig.colorbar(cp2)
 fig.colorbar(cp3)
 plt.autoscale(False)
-plt.show() 
-  
+plt.imshow(zvalues2)
+plt.imshow(zvalues3) 
+
 '''
 dispcontx=[];
 dispconty=[]; 
@@ -728,7 +704,8 @@ for i in range(len(globnodes)):
         dispcontx.append(dispcont[0])
         dispconty.append(dispcont[1])
         addingup=addingup+2
-'''    
+''' 
+  
 dispcontx=0
 dispconty= 0  
 xvalues=np.linspace(0,br,nor)   ###Arranging elements
@@ -739,7 +716,7 @@ zvalues1=np.zeros([nor,noc])
 loop1=0;
 for i in range(len(xvalues)):
     for j in range(len(yvalues)):
-        dispall=displacement[loop]
+        dispall=displacement[loop1]
         zvalues[i][j]=dispall[0]
         zvalues1[i][j]=dispall[1]
         loop1=loop1+1;
@@ -759,7 +736,5 @@ cp1 =ax1.contourf(xv, yv, zvalues1) ##Problem in contour plot
 fig.colorbar(cp)
 fig.colorbar(cp1)
 plt.autoscale(False)
-plt.show()       
-  
-    
-    
+plt.imshow(zvalues)
+plt.imshow(zvalues1)       
