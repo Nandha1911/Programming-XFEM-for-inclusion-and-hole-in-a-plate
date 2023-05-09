@@ -26,9 +26,9 @@ from Assembly_Stiffness_mat import assembly_K
 from Naming_the_umatrix import naming_umatrix
 from Stress_strain_components import stress_strain_component
 
-L=10;                    #Length of the plate(in cm)(---->Vertical length)-->Corresponds to columns-->y=direction
-br=10;                    #Breadth of the plate(in cm)(Horizontal length)-->Corresponds to rows-->x-direction
-l = 1;                   #element size-square (in cm)
+L=2;                    #Length of the plate(in cm)(---->Vertical length)-->Corresponds to columns-->y=direction
+br=2;                    #Breadth of the plate(in cm)(Horizontal length)-->Corresponds to rows-->x-direction
+l = 0.05;                   #element size-square (in cm)
 nor= int((br/l));         #Number of elements in a meshed plate in X-direction
 noc= int((L/l));         #Number of elements in a meshed plate in Y-direction
 norforpartition = 3
@@ -38,8 +38,8 @@ elementnoc=[];             #Containing elements that is not cut by
 elementc=[];
 phivalues=[];            #All phivalues of an element(4nodes) will be saved in this list
 phivalforpart=[];
-a1=5;b1=5;               #Coordinates of the center of the circle
-r1=2.5;                    #Radius of the circle
+a1=1;b1=1;               #Coordinates of the center of the circle
+r1=0.4;                    #Radius of the circle
 a2=0;b2=0;                  ##a respect to breadth(b)....b respects to Length(L)
 r2=0;
 #DOF=[];
@@ -53,9 +53,9 @@ elementswglobnode=[];
 aDOF=[];
 Kloc=[];
 globU=[];          
-E1=1*(10**5)         #Young's modulus in N/cm2(Steel plate)
+E1=1*(10**5)         #Young's modulus in Kg/cm2(Steel plate)
 E2=0.01*E1;
-#E2=1*(10**5)           #Young's modulus in N/cm2(Hole) #To avoid singular stiffness matrices1(E2/E1=0.01)
+#E2=1*(10**5)           #Young's modulus in Kg/cm2(Hole) #To avoid singular stiffness matrices1(E2/E1=0.01)
 #E2=0; 
 E3=4.19*(10**5)    
 nu=0.3;
@@ -81,11 +81,7 @@ elementcuthole=[];
 elementcutinc=[];
 stress=[];
 strain=[];
-sigmax=[];
-sigmay=[];
-sigmaenrfl=[];
-sigmastdfl=[];
-x=[];
+#x=[];
 parlist=[];
 Edges=[];
 #phivaluesforinc=[];
@@ -523,7 +519,7 @@ if Answer == 'Yes':
       fbloc2=F3[i];
       Ftract=Tottractforceassm(i,globnumber,elementnoc,DOF,globnodesextra,fbloc2,Ftract1)  
    
-  ii = input("Want to give Traction force for another edge : ")   #Yes or no
+  ii = input("Want to give Traction force for another edge Type(Yes or No): ")   #Yes or no
   if ii == "No":
     break; 
 '''
@@ -564,12 +560,16 @@ F=Fbod+Ftract;
 ######For finding the fixed nodes(global number)########which helps in Dirichllet BC
 #fixed_edge=input("Enter the name of the fixed edge : ")
 BCnodes=[]; ##Checking for boundary nodes
-while True: 
+Constraints=input("Are you need to fix/constraints the Edges? Type:(Yes or No)")
+if Constraints == 'No':
+    fixedDOFSlist1=[]
+else:
+ while True: 
   fixed_edge=input("Enter the name of the fixed edge : ")
   boundarynodes=[]
   #fixed_edge="Edge3"     #Temporary
-  if fixed_edge =="No":    #Temp
-      break;
+  #if fixed_edge =="No":    #Temp
+     # break;
   if fixed_edge == "Edge1": 
          bnodes = fixednodes(nor,noc,"Edge1",globnodes,globnumber,l)
   elif fixed_edge == "Edge2":
@@ -613,8 +613,8 @@ while True:
         fixDOF=fixedDOFSlist[i];
         K,l3=DirichletBC(i,fixDOF,fixedDOFSlist,K,flatten1,l3)
         
-  ii = input("Want to fix another edge : ")   #Yes or no
-  if ii == "no":
+  ii = input("Want to fix another edge,Please Type Yes or No : ")   #Yes or no
+  if ii == "No":
       break;
 
 '''
@@ -625,6 +625,12 @@ else:
        fixDOF=fixedDOFSlist[i];
        K,l3=DirichletBC(i,fixDOF,fixedDOFSlist,K,flatten1,l3)
 '''
+
+fixedDOFSlist=['x'+str(0),'y'+str(0),'x'+str(1560),'y'+str(1560)]
+for i in range(len(fixedDOFSlist)):
+      fixDOF=fixedDOFSlist[i];
+      K,l3=DirichletBC(i,fixDOF,fixedDOFSlist,K,flatten1,l3)
+
 #BCnodes1=list(np.concatenate(BCnodes).flat)    ###Checkpoint for boundarynodes..BCnodes 1should match with fixedDOFlist
   #ii = input("Want to fix another edge : ")   #Yes or no
   #if ii == "no":
@@ -632,8 +638,6 @@ else:
       
 
   
-#flatten=np.matmul(np.linalg.inv(K),F);
-
 flatten=np.linalg.solve(K,F);  
 
 
@@ -673,39 +677,15 @@ ax2.set_xlabel('Breadth of the plate',fontweight='bold')
 ax2.set_ylabel('Length of the plate',fontweight='bold')
 ax3.set_xlabel('Breadth of the plate',fontweight='bold')
 ax3.set_ylabel('Length of the plate',fontweight='bold')
-cp2 = ax2.contourf(xv1, yv1, zvalues2) 
-cp3 = ax3.contourf(xv1, yv1, zvalues3)
+cp2 = ax2.contourf(xv1, yv1, zvalues2,cmap='jet') 
+cp3 = ax3.contourf(xv1, yv1, zvalues3,cmap='jet')
 fig.colorbar(cp2)
 fig.colorbar(cp3)
 plt.autoscale(False)
-plt.imshow(zvalues2)
-plt.imshow(zvalues3) 
+plt.show()
+plt.show() 
 
-'''
-dispcontx=[];
-dispconty=[]; 
-addingup=0;
-for i in range(len(globnodes)):
-      #addingup=addingup
-      nod=globnodes[i]
-      time=[];
-      for k in range(len(new)):  #To check the new(varible) list,we are using for loop(k): 
-        check1=np.array_equal(nod,new[k]);
-        time.append(check1);
-        if check1==True:
-            break;
-      if any(time) == True:
-        dispcont=flatten[addingup:(addingup+4),0]
-        dispcontx.append((dispcont[0]+dispcont[2]))
-        dispconty.append((dispcont[1]+dispcont[3]))
-        addingup=addingup+4
-      else:
-        dispcont=flatten[addingup:(addingup+2),0]
-        dispcontx.append(dispcont[0])
-        dispconty.append(dispcont[1])
-        addingup=addingup+2
-''' 
-  
+
 dispcontx=0
 dispconty= 0  
 xvalues=np.linspace(0,br,nor)   ###Arranging elements
@@ -731,10 +711,10 @@ ax.set_xlabel('Breadth of the plate',fontweight='bold')
 ax.set_ylabel('Length of the plate',fontweight='bold')
 ax1.set_xlabel('Breadth of the plate',fontweight='bold')
 ax1.set_ylabel('Length of the plate',fontweight='bold')
-cp = ax.contourf(xv, yv, zvalues) ##Problem in contour plot
-cp1 =ax1.contourf(xv, yv, zvalues1) ##Problem in contour plot
+cp = ax.contourf(xv, yv, zvalues,cmap='jet') ##Problem in contour plot
+cp1 =ax1.contourf(xv, yv, zvalues1,cmap='jet') ##Problem in contour plot
 fig.colorbar(cp)
 fig.colorbar(cp1)
 plt.autoscale(False)
-plt.imshow(zvalues)
-plt.imshow(zvalues1)       
+plt.show()
+plt.show()       
