@@ -1,15 +1,17 @@
 import numpy as np
 
 
+
 def naming_umatrix(noc,nor,l,new,zz,aDOFsiz,usize,globnodesextra,globnodes,globU,u,aDOF):
   for i in range(noc+1):
       for j in range(nor+1):
         check=[];             #Creating temporary list to store Boolean values in order to
         tempU=[];                      #check whether the global node array matches with any of the 
                               #new values(List) --Comparing global node value with new(variable List
-        globnode=[round(j*l,2),round(i*l,2)];        #problem in globnode--0.1cm mesh
+        globnode=np.array([round(j*l,2),round(i*l,2)]);        #problem in globnode--0.1cm mesh
         for k in range(len(new)):  #To check the new(varible) list,we are using for loop(k): 
-            check1=np.array_equal(globnode,new[k]);
+            #just=(new[k]);
+            check1=np.allclose(globnode,new[k]);
             check.append(check1);
             if check1==True:
                 break;
