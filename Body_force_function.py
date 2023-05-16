@@ -1,13 +1,16 @@
 import numpy as np
 
 
-def Totbodyforcefunc(i,Bmat,Bmatenr,element,elementnoc,wi,t,det,bodforce,totbodyforce,N1,N2,
-                     N3,N4,c1,c2,xi1,xi2,phivalues):
+def Totbodyforcefunc(i,Bmat,Bmatenr,element,elementnoc,wi,t,det,bodforce,bodyforceelem,N1,N2,
+                     N3,N4,c1,c2,phivalues):
+  for i in range(len(element)):
      sizoff=np.shape(Bmat);
      sizoff1=np.shape(Bmatenr);
     # for i in range(len(element)): 
      #fbstd=np.zeros(sizoff[1]);
-         #fbenr=np.zeros(sizoff1[1]);  
+         #fbenr=np.zeros(sizoff1[1]);
+     xi1 = np.array([-1,1,1,-1]);
+     xi2 = np.array([-1,-1,1,1]);
      def bodyforce(i,elemtyp,j):
         N11=N1.subs(c1,xi1[j]).subs(c2,xi2[j]);
         N12=N2.subs(c1,xi1[j]).subs(c2,xi2[j]);
@@ -43,5 +46,5 @@ def Totbodyforcefunc(i,Bmat,Bmatenr,element,elementnoc,wi,t,det,bodforce,totbody
                 fb=fbenr.reshape(-1,1,order='F');
             
             
-         
-     return fb
+     bodyforceelem.append(fb)    
+  return bodyforceelem
