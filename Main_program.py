@@ -32,15 +32,15 @@ from Analytical_solution import analyt
 ######Inputs section###############
 ####___Length of the plate(in cm)(---->Vertical length)-->Corresponds to columns-->y=direction___#####
 #L=float(input("Enter the Length (vertical) of the plate : " )) 
-L=2 
+L=2
 #Breadth of the plate(in cm)(Horizontal length)-->Corresponds to rows-->x-direction
 
 #br=float(input("Enter the Breadth (Horizontal) of the plate : " )) 
-br=2          
+br=2       
 #Mesh size-square (in cm)
 
 #l = float(input("Enter the mesh size of the element : "))   
-l=0.05 
+l=0.05
           
 nor= int((br/l));         #Number of elements in a meshed plate in X-direction
 noc= int((L/l));          #Number of elements in a meshed plate in Y-direction
@@ -69,7 +69,7 @@ a1=1;b1=1
 r1=0.4
   #Young's modulus in Kg/cm2(Steel plate)                 
 #E1=float(input("Enter the Young's modulus of the discontinuity_1(hole/inclusion) : ")) 
-E1=419000
+E1=100
   #Poisson ratio for the discontinuity_1
 #nu1=float(input("Enter the poisson ratio for the discontinuity_1(hole/inclusion) : "))
 nu1=0.3
@@ -471,22 +471,23 @@ F=Fbod+Ftract;
 ######First finding the fixed nodes(global number) which helps us to solve the linear system of 
 ######equations
 
-#####Diagram for user to decide which edges to be fixed#####################
-                               #Edge3
-                   #################################
-                   #                               #
-                   #                               #
-                   #                               #
-                   #                               #
-                   #                               #
-       #Edge4==>   #                               #  <==Edge2
-                   #                               #
-                   #                               #
-                   #                               #
-                   #                               #
-                   #                               #
-                   #################################
-                              #Edge1
+#####Diagram for user to decide which edges/cornernodes to be fixed#####################
+                                #Edge3
+                   #################################                  '3'#############################'4'
+                   #                               #                  #                                #
+                   #                               #                  #                                #
+                   #                               #                  #                                #
+                   #                               #                  #                                #
+                   #                               #                  #                                #
+       #Edge4==>   #                               #  <==Edge2        #       Cornernodes number       #
+                   #                               #                  #                                #
+                   #                               #                  #                                #
+                   #                               #                  #                                #
+                   #                               #                  #                                #
+                   #                               #                  #                                #
+                   #################################                  '1'#############################'2'
+                               #Edge1                                    
+
                    
                    
                    
@@ -500,9 +501,10 @@ while True:
   print('######################################################')  
   print("Applying Dirichlet Boundary Conditions")
   fix=input("Do you want to fix the 'Edge(s)' or 'cornernode(s)'? : Type '1' for Edge, '2' for cornernodes")
+  boundarynodes=[]
   if fix == '1':
     fixed_edge=input("Enter the name of the edge need to be fixed : ")
-    boundarynodes=[]
+    #boundarynodes=[]
     if fixed_edge == "Edge1": 
          bnodes = fixednodes(nor,noc,"Edge1",globnodes,globnumber,l)
     elif fixed_edge == "Edge2":
@@ -515,25 +517,25 @@ while True:
          print("The entered edge has not been found amoung those edges")       
    ##############Cornernodes##########################################
   elif fix == '2':
-     corner_node=input("Enter the name of the cornernode need to be fixed (Type 1 or 2 or 3 or 4) : ")
-     if corner_node == "1":   
-          bnodes = cornernodenum[0];
-     elif corner_node == "2":   
-          bnodes = cornernodenum[1]; 
-     elif corner_node == "3":   
-         bnodes = cornernodenum[2];
-     elif corner_node == "4":   
-          bnodes = cornernodenum[3]; 
+     corner_node=(input("Enter the number of the cornernode need to be fixed (Type 1 or 2 or 3 or 4) : "))
+     if corner_node == '1':   
+          bnodes = [cornernodenum[0]];
+     elif corner_node == '2':   
+          bnodes = [cornernodenum[1]]; 
+     elif corner_node == '3':   
+         bnodes = [cornernodenum[2]];
+     elif corner_node == '4':   
+          bnodes = [cornernodenum[3]]; 
      else:
        print("The entered edge has not been found amoung those edges")
-    
+     
   boundarynodes.extend(bnodes)   ##Bnodes and boundary nodes are same
   
 ###################Applying Dirchelet Boundary Conditions###################
 ###After finding the fixed nodes (by knowing which edge is fixed),we can able to transform the Stiffness matrix(K)
 ###in order to solve the linear system of equations
 
-  FixedDOFS3=input("Do you need to constrain the nodes of respective edge/cornernode in the x-dir or y-dir or both?")
+  FixedDOFS3=input("Do you need to constrain the nodes of respective edge/cornernode in the x-dir or y-dir or both ? : ")
   for i in range(len(boundarynodes)):
      j=boundarynodes[i]
   
@@ -594,11 +596,13 @@ for i in range(len(element)):
     disp=umatrix[i];   
     disp3,actdisp=Disp_stress_strain(i,disp,flatten,Bmatrix,elementc,elementnoc,elementinsidehole,phivalues)         ##Stress and strain will come from this block
     displacement.append(actdisp);
-    stress1,strain1=stress_strain_component(i,disp,flatten,element,elementc,elementnoc,elementinsidehole,Dstd,D1,phivalues,\
-                                            phivalforpart,increment)
-    stress.append(stress1)
-    strain.append(strain1)
+   # stress1,strain1,increment=stress_strain_component(i,disp,flatten,element,elementc,elementnoc,elementinsidehole,Dstd,D1,phivalues,\
+   #                                         phivalforpart,increment)
+   # stress.append(stress1)
+   # strain.append(strain1)
 
+stress,strain,increment=stress_strain_component(umatrix,flatten,element,elementc,elementnoc,elementinsidehole,Dstd,D1,phivalues,\
+                                        phivalforpart,increment)
 ###############Displacement_interpolation at all nodes##################
 #totalactdisp=[];
 #disp3,totalactdisp,assembleddispx,assembleddispy=Displacement(flatten,Bmatrix,elementc,elementnoc,elementinsidehole,phivalues,element,umatrix,\
